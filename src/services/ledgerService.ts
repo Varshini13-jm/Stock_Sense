@@ -9,6 +9,24 @@ export async function getLedger(filters?: {
   limit?: number
   offset?: number
 }): Promise<{ data: StockMovement[]; count: number }> {
+  const limit = filters?.limit ?? 50
+  const offset = filters?.offset ?? 0
+
+  // If searching by product name/sku, find matching product IDs first
+  let productIds: string[] | null = null
+  if (filters?.search) {
+    const { data: matchedProducts } = await supabase
+      .from('products')
+      .select('id')
+      .or(`name.ilike.%${filters.search}%,sku.ilike.%${filters.search}%`)
+
+    productIds = (matchedProducts ?? []).map((p) => p.id)
+    // If no matching products, return empty immediately
+    if (productIds.length === 0) {
+      return { data: [], count: 0 }
+    }
+  }
+
   let query = supabase
     .from('stock_movements')
     .select(`
@@ -19,10 +37,8 @@ export async function getLedger(filters?: {
     `, { count: 'exact' })
     .order('created_at', { ascending: false })
 
-  if (filters?.search) {
-    query = query.or(
-      `product.name.ilike.%${filters.search}%,product.sku.ilike.%${filters.search}%`
-    )
+  if (productIds !== null) {
+    query = query.in('product_id', productIds)
   }
   if (filters?.movement_type && filters.movement_type !== 'all') {
     query = query.eq('movement_type', filters.movement_type)
@@ -34,8 +50,6 @@ export async function getLedger(filters?: {
     query = query.eq('product_id', filters.product_id)
   }
 
-  const limit = filters?.limit ?? 50
-  const offset = filters?.offset ?? 0
   query = query.range(offset, offset + limit - 1)
 
   const { data, error, count } = await query

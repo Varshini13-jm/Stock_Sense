@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Eye, EyeOff, LogIn, AlertCircle, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Eye, EyeOff, LogIn, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { BrandMark } from '../components/ui/BrandMark'
-import { signIn, setDemoSession } from '../services/authService'
+import { signIn } from '../services/authService'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 
 export default function LoginPage() {
@@ -12,12 +12,10 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [isUnconfirmed, setIsUnconfirmed] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-    setIsUnconfirmed(false)
 
     if (!email || !password) {
       setError('Please fill in both email and password.')
@@ -30,20 +28,10 @@ export default function LoginPage() {
       navigate('/dashboard')
     } catch (err: any) {
       const msg = err?.message || 'Login failed.'
-      if (msg.toLowerCase().includes('email not confirmed')) {
-        setIsUnconfirmed(true)
-        setError('Your email requires confirmation by Supabase Auth.')
-      } else {
-        setError(msg)
-      }
+      setError(msg)
     } finally {
       setLoading(false)
     }
-  }
-
-  function handleDemoAccess() {
-    setDemoSession()
-    navigate('/dashboard')
   }
 
   return (
@@ -93,7 +81,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right panel — Form & Login Card */}
+      {/* Right panel — Login Form */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md bg-[#0E131A] border border-[#273241] rounded-2xl p-8 shadow-2xl space-y-6">
           <div className="space-y-2 text-center lg:text-left">
@@ -102,35 +90,24 @@ export default function LoginPage() {
               <span className="text-xl font-bold text-white">StockSense</span>
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Sign in to StockSense</h1>
-            <p className="text-xs text-zinc-400">Enter your warehouse credentials to access your console</p>
+            <p className="text-xs text-zinc-400">Enter your credentials to access your inventory console</p>
           </div>
 
-          {/* Unconfirmed Email Special Notice & Bypass */}
-          {isUnconfirmed && (
-            <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-3 text-xs">
-              <div className="flex items-start gap-2 text-amber-400">
+          {/* Error */}
+          {error && (
+            <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400 space-y-2">
+              <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold">Email Confirmation Required by Supabase</p>
-                  <p className="text-zinc-400 mt-1">Supabase Auth requires link confirmation or you can bypass confirmation for evaluation.</p>
-                </div>
+                <span className="font-semibold">{error}</span>
               </div>
-              <button
-                type="button"
-                onClick={handleDemoAccess}
-                className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5"
-              >
-                <span>Enter Console (Demo Session Bypass)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
-
-          {/* Standard Error */}
-          {error && !isUnconfirmed && (
-            <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{error}</span>
+              {error.toLowerCase().includes('email not confirmed') && (
+                <div className="pl-6 pt-1 text-zinc-400 space-y-1 text-[11px]">
+                  <p className="text-amber-400 font-medium">To fix this in your Supabase project:</p>
+                  <p>1. Open <strong>Supabase Dashboard</strong> → <strong>Authentication</strong> → <strong>Providers</strong> → <strong>Email</strong></p>
+                  <p>2. Turn off <strong>"Confirm email"</strong> and click <strong>Save</strong>.</p>
+                  <p>3. Or check your inbox / spam folder for the Supabase confirmation email.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -145,7 +122,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="manager@stocksense.com"
+                placeholder="manager@yourcompany.com"
                 className="w-full px-4 py-2.5 bg-[#070A0E] border border-[#273241] rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-[#1769FF]"
                 required
               />
@@ -191,29 +168,20 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="relative flex items-center justify-center">
-            <div className="w-full border-t border-[#273241]" />
-            <span className="absolute bg-[#0E131A] px-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
-              Instant Access
-            </span>
-          </div>
-
-          {/* Instant Demo Session Bypass Button */}
-          <button
-            type="button"
-            onClick={handleDemoAccess}
-            className="w-full py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Instant Demo Access (Bypass Confirmation)</span>
-          </button>
-
           <p className="text-xs text-center text-zinc-400 pt-2">
             Don't have an account?{' '}
             <Link to="/signup" className="font-bold text-[#1769FF] hover:underline">
               Create Account
             </Link>
+          </p>
+
+          <p className="text-xs text-center text-zinc-600">
+            <button
+              onClick={() => window.location.href = '/connect'}
+              className="hover:text-zinc-400 transition-colors"
+            >
+              Change Supabase project →
+            </button>
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react'
 import { BrandMark } from '../components/ui/BrandMark'
-import { signUp, setDemoSession } from '../services/authService'
+import { signUp } from '../services/authService'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 
 export default function SignupPage() {
@@ -43,11 +43,6 @@ export default function SignupPage() {
     }
   }
 
-  function handleDemoAccess() {
-    setDemoSession()
-    navigate('/dashboard')
-  }
-
   if (success) {
     return (
       <div className="min-h-screen bg-[#070A0E] text-zinc-100 flex items-center justify-center p-6">
@@ -58,29 +53,25 @@ export default function SignupPage() {
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-white tracking-tight">Account Registered!</h2>
             <p className="text-xs text-zinc-400">
-              Your profile for <strong className="text-white">{email}</strong> has been registered.
+              Your profile for <strong className="text-white">{email}</strong> has been created.
             </p>
           </div>
 
-          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl text-xs text-blue-300 space-y-2">
-            <p className="font-semibold">Ready to enter your StockSense Console?</p>
-            <p className="text-zinc-400 text-[11px]">Click below to enter immediately into the dashboard.</p>
+          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl text-xs text-blue-300 space-y-2 text-left">
+            <p className="font-semibold text-blue-200">Next Steps to Sign In:</p>
+            <ul className="text-zinc-400 text-[11px] list-disc list-inside space-y-1">
+              <li>If email confirmation is enabled in your Supabase project, check your inbox/spam for the confirmation link.</li>
+              <li>Or disable <em>"Confirm email"</em> in Supabase Dashboard → <em>Authentication → Providers → Email</em> for immediate login.</li>
+            </ul>
           </div>
 
           <div className="space-y-3 pt-2">
             <button
-              onClick={handleDemoAccess}
+              onClick={() => navigate('/login')}
               className="w-full py-3 bg-[#1769FF] hover:bg-blue-600 text-white font-bold text-sm rounded-xl transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
             >
-              <span>Enter Console Directly</span>
+              <span>Go to Sign In</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => navigate('/login')}
-              className="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-xs rounded-xl transition-colors"
-            >
-              Return to Login Screen
             </button>
           </div>
         </div>

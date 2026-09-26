@@ -80,37 +80,109 @@ export async function getCategories(): Promise<Category[]> {
   return (data ?? []) as Category[]
 }
 
+export async function createCategory(name: string): Promise<Category> {
+  const trimmed = name.trim()
+  // Check if category already exists
+  const { data: existing } = await supabase
+    .from('categories')
+    .select('*')
+    .ilike('name', trimmed)
+    .maybeSingle()
+
+  if (existing) return existing as Category
+
+  const { data, error } = await supabase
+    .from('categories')
+    .insert({ name: trimmed })
+    .select()
+    .single()
+  if (error) throw error
+  return data as Category
+}
+
+export async function updateCategory(id: string, name: string): Promise<Category> {
+  const { data, error } = await supabase
+    .from('categories')
+    .update({ name: name.trim() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data as Category
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+  // Check if category has products
+  const { count } = await supabase
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('category_id', id)
+  if ((count ?? 0) > 0) {
+    throw new Error('Cannot delete a category that has products assigned to it. Reassign or delete the products first.')
+  }
+  const { error } = await supabase.from('categories').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function createProduct(input: CreateProductInput): Promise<Product> {
-  // Check SKU uniqueness
+  const cleanSku = input.sku.trim().toUpperCase()
+  const cleanName = input.name.trim()
+
+  // Check SKU uniqueness using maybeSingle (does not throw when 0 rows found)
   const { data: existing } = await supabase
     .from('products')
     .select('id')
-    .eq('sku', input.sku)
-    .single()
+    .eq('sku', cleanSku)
+    .maybeSingle()
 
-  if (existing) throw new Error(`SKU "${input.sku}" already exists. Please use a unique SKU.`)
+  if (existing) throw new Error(`SKU "${cleanSku}" already exists. Please use a unique SKU.`)
+
+  const payload: Record<string, any> = {
+    name: cleanName,
+    sku: cleanSku,
+    category_id: input.category_id || null,
+    unit_of_measure: input.unit_of_measure.trim(),
+    unit: input.unit_of_measure.trim(),
+    reorder_point: Number(input.reorder_point) || 0,
+  }
 
   const { data, error } = await supabase
     .from('products')
-    .insert({
-      name: input.name,
-      sku: input.sku,
-      category_id: input.category_id || null,
-      unit_of_measure: input.unit_of_measure,
-      reorder_point: input.reorder_point,
-    })
+    .insert(payload)
     .select()
     .single()
 
   if (error) throw error
 
-  // If initial stock provided
-  if (input.initial_quantity && input.initial_quantity > 0 && input.initial_location_id) {
-    await supabase.from('inventory_balances').upsert({
-      product_id: data.id,
-      location_id: input.initial_location_id,
-      quantity: input.initial_quantity,
-    })
+  // If initial stock provided — create a proper inventory balance AND a stock movement ledger entry
+  if (input.initial_quantity && Number(input.initial_quantity) > 0 && input.initial_location_id) {
+    const qty = Number(input.initial_quantity)
+    try {
+      // Set the balance
+      const { error: balError } = await supabase
+        .from('inventory_balances')
+        .upsert({
+          product_id: data.id,
+          location_id: input.initial_location_id,
+          quantity: qty,
+          updated_at: new Date().toISOString(),
+        })
+      if (balError) console.warn('[productsService] Inventory balance notice:', balError.message)
+
+      // Record the stock movement so ledger is complete
+      const { error: movError } = await supabase
+        .from('stock_movements')
+        .insert({
+          product_id: data.id,
+          location_id: input.initial_location_id,
+          quantity_delta: qty,
+          movement_type: 'receipt',
+          reason: 'Initial stock on product creation',
+        })
+      if (movError) console.warn('[productsService] Ledger movement notice:', movError.message)
+    } catch (stockErr: any) {
+      console.warn('[productsService] Initial stock warning:', stockErr?.message || stockErr)
+    }
   }
 
   return data as Product
@@ -118,19 +190,23 @@ export async function createProduct(input: CreateProductInput): Promise<Product>
 
 export async function updateProduct(id: string, input: Partial<CreateProductInput>): Promise<Product> {
   if (input.sku) {
+    const cleanSku = input.sku.trim().toUpperCase()
     const { data: existing } = await supabase
       .from('products')
       .select('id')
-      .eq('sku', input.sku)
+      .eq('sku', cleanSku)
       .neq('id', id)
-      .single()
-    if (existing) throw new Error(`SKU "${input.sku}" already exists.`)
+      .maybeSingle()
+    if (existing) throw new Error(`SKU "${cleanSku}" already exists.`)
   }
+
+  // Strip initial stock fields — stock only changes via operations
+  const { initial_quantity: _iq, initial_location_id: _il, ...updateFields } = input
 
   const { data, error } = await supabase
     .from('products')
     .update({
-      ...input,
+      ...updateFields,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

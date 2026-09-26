@@ -45,6 +45,7 @@ export function useAuth() {
 
     // Check Supabase session
     const { data } = await supabase.auth.getSession()
+
     if (data.session?.user) {
       setState({
         user: data.session.user,
@@ -66,7 +67,9 @@ export function useAuth() {
   useEffect(() => {
     checkAuth()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       const demo = localStorage.getItem('stocksense-demo-user')
       if (demo) return
 

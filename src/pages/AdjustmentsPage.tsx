@@ -69,14 +69,14 @@ export function AdjustmentsPage() {
 
   const getStatusBadge = (status: DocumentStatus) => {
     const styles: Record<DocumentStatus, string> = {
-      draft: 'bg-zinc-800 text-zinc-300 border-zinc-700',
-      waiting: 'bg-amber-950/60 text-amber-400 border-amber-800/50',
-      ready: 'bg-blue-950/60 text-blue-400 border-blue-800/50',
-      done: 'bg-emerald-950/60 text-emerald-400 border-emerald-800/50',
-      canceled: 'bg-rose-950/60 text-rose-400 border-rose-800/50',
+      draft: 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700',
+      waiting: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-800/50',
+      ready: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800/50',
+      done: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800/50',
+      canceled: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800/50',
     }
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status]}`}>
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[status]}`}>
         {status.toUpperCase()}
       </span>
     )
@@ -88,14 +88,14 @@ export function AdjustmentsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-6 h-6 text-amber-400" />
-            <h1 className="text-2xl font-bold text-white tracking-tight">Physical Inventory Adjustments</h1>
+            <SlidersHorizontal className="w-6 h-6 text-amber-500" />
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Physical Inventory Adjustments</h1>
           </div>
-          <p className="text-sm text-zinc-400 mt-1">Reconcile physical stock counts with theoretical system quantities</p>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">Reconcile physical stock counts with theoretical system quantities</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold text-sm transition-colors shadow-lg shadow-amber-500/10"
+          className="btn-primary bg-amber-500 hover:bg-amber-600 text-white"
         >
           <Plus className="w-4 h-4" />
           <span>New Adjustment</span>
@@ -103,27 +103,27 @@ export function AdjustmentsPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/80">
+      <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between bg-white dark:bg-[#0E131A] p-4 rounded-xl border border-slate-200 dark:border-[#273241] shadow-sm">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Search by reference #..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500/50"
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1769FF] shadow-sm"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-          <Filter className="w-4 h-4 text-zinc-500 shrink-0 ml-1" />
+          <Filter className="w-4 h-4 text-slate-400 shrink-0 ml-1" />
           {(['all', 'draft', 'ready', 'done', 'canceled'] as const).map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border ${
                 statusFilter === st
-                  ? 'bg-zinc-800 text-zinc-100 border-zinc-700'
-                  : 'bg-zinc-950/40 text-zinc-400 border-zinc-800/50 hover:bg-zinc-800/50'
+                  ? 'bg-amber-500 text-white border-amber-500'
+                  : 'bg-slate-50 dark:bg-zinc-950/40 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-800/50 hover:bg-slate-100'
               }`}
             >
               {st.charAt(0).toUpperCase() + st.slice(1)}
@@ -146,11 +146,11 @@ export function AdjustmentsPage() {
           onAction={() => setIsModalOpen(true)}
         />
       ) : (
-        <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
+        <div className="bg-white dark:bg-[#0E131A] border border-slate-200 dark:border-[#273241] rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider bg-zinc-950/50">
+                <tr className="border-b border-slate-200 dark:border-zinc-800 text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider bg-slate-50 dark:bg-zinc-950/50">
                   <th className="py-3.5 px-4">Reference</th>
                   <th className="py-3.5 px-4">Location</th>
                   <th className="py-3.5 px-4">Items Counted</th>
@@ -159,28 +159,28 @@ export function AdjustmentsPage() {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 text-sm">
+              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/60 text-sm">
                 {documents.map((doc) => (
                   <tr
                     key={doc.id}
                     onClick={() => navigate(`/documents/${doc.id}`)}
-                    className="hover:bg-zinc-800/40 cursor-pointer transition-colors group"
+                    className="hover:bg-slate-50 dark:hover:bg-zinc-800/40 cursor-pointer transition-colors group"
                   >
-                    <td className="py-3.5 px-4 font-mono font-medium text-amber-400 group-hover:underline">
+                    <td className="py-3.5 px-4 font-mono font-bold text-amber-600 dark:text-amber-400 group-hover:underline">
                       {doc.reference_no}
                     </td>
-                    <td className="py-3.5 px-4 text-zinc-300">
+                    <td className="py-3.5 px-4 text-slate-700 dark:text-zinc-300">
                       {doc.source_location?.name ? (
-                        <span>{doc.source_location.warehouse?.name} / <strong>{doc.source_location.name}</strong></span>
+                        <span>{doc.source_location.warehouse?.name} / <strong className="text-slate-900 dark:text-zinc-100">{doc.source_location.name}</strong></span>
                       ) : '—'}
                     </td>
-                    <td className="py-3.5 px-4 text-zinc-400">
+                    <td className="py-3.5 px-4 text-slate-500 dark:text-zinc-400 font-medium">
                       {doc.lines?.length || 0} line(s)
                     </td>
                     <td className="py-3.5 px-4">
                       {getStatusBadge(doc.status)}
                     </td>
-                    <td className="py-3.5 px-4 text-zinc-400 text-xs">
+                    <td className="py-3.5 px-4 text-slate-400 dark:text-zinc-400 text-xs">
                       {formatDateShort(doc.created_at)}
                     </td>
                     <td className="py-3.5 px-4 text-right">
@@ -189,13 +189,13 @@ export function AdjustmentsPage() {
                           <button
                             onClick={(e) => handleValidate(e, doc.id)}
                             disabled={actionLoadingId === doc.id}
-                            className="px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold border border-amber-500/30 transition-colors inline-flex items-center gap-1 disabled:opacity-50"
+                            className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-semibold border border-amber-200 transition-colors inline-flex items-center gap-1 disabled:opacity-50"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>{actionLoadingId === doc.id ? 'Validating...' : 'Validate'}</span>
                           </button>
                         )}
-                        <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-amber-500 transition-colors" />
                       </div>
                     </td>
                   </tr>
@@ -208,10 +208,10 @@ export function AdjustmentsPage() {
 
       {/* New Adjustment Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <SlidersHorizontal className="w-5 h-5 text-amber-400" />
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0E131A] border border-slate-200 dark:border-[#273241] rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-[#273241] pb-3">
+              <SlidersHorizontal className="w-5 h-5 text-amber-500" />
               <span>Create Physical Adjustment</span>
             </h2>
             <DocumentForm
