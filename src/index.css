@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Dark mode default canvas */
+  html.dark body {
+    background-color: #070A0E;
+    color: #F5F7FA;
+  }
+
+  /* Light mode canvas */
+  html.light body, body {
+    background-color: #F7F7F4;
+    color: #0B0D10;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Refined scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: #273241;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  /* Electric Blue Primary Button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1769FF] hover:bg-[#0052E0] text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-blue-500/20 active:translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Orange Attention Button */
+  .btn-warning {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#FF7A00] hover:bg-[#E06B00] text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-orange-500/20 active:translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary Bordered Button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-[#0E131A] text-zinc-900 dark:text-[#F5F7FA] font-semibold text-xs rounded-xl border border-zinc-200 dark:border-[#273241] hover:bg-zinc-100 dark:hover:bg-[#151B23] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Primary Card Surface */
+  .card {
+    @apply bg-white dark:bg-[#0E131A] border border-zinc-200 dark:border-[#273241] rounded-2xl p-5 shadow-sm text-zinc-900 dark:text-[#F5F7FA];
+  }
+
+  /* Elevated Card Surface */
+  .card-elevated {
+    @apply bg-zinc-50 dark:bg-[#151B23] border border-zinc-200 dark:border-[#273241] rounded-2xl p-5 shadow-sm text-zinc-900 dark:text-[#F5F7FA];
+  }
+
+  /* Input Fields */
+  .input-field {
+    @apply w-full px-3.5 py-2 text-xs bg-white dark:bg-[#0E131A] border border-zinc-200 dark:border-[#273241] rounded-xl text-zinc-900 dark:text-[#F5F7FA] placeholder-zinc-400 focus:outline-none focus:border-[#1769FF] transition-colors;
+  }
+
+  /* Typography & Table Components */
+  .section-title {
+    @apply text-sm font-bold text-zinc-900 dark:text-[#F5F7FA];
+  }
+
+  .table-th {
+    @apply px-4 py-3 text-left text-[11px] font-bold text-zinc-500 dark:text-[#94A3B8] uppercase tracking-wider border-b border-zinc-200 dark:border-[#273241] bg-zinc-50 dark:bg-[#151B23];
+  }
+
+  .table-td {
+    @apply px-4 py-3 text-xs text-zinc-700 dark:text-[#F5F7FA] border-b border-zinc-100 dark:border-[#273241]/60;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
