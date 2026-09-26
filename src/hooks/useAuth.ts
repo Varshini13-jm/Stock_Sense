@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Profile } from '../types/inventory'
 import type { User, Session } from '@supabase/supabase-js'
-import { getProfile, DEMO_USER } from '../services/authService'
+import { getProfile } from '../services/authService'
 
 interface AuthState {
   user: User | any | null
@@ -33,10 +33,10 @@ export function useAuth() {
         user: demoUser,
         session: { user: demoUser } as any,
         profile: {
-          id: DEMO_USER.id,
+          id: demoUser.id ?? 'demo-user',
           full_name: 'Demo Inventory Manager',
           role: 'Inventory Manager',
-          created_at: DEMO_USER.created_at,
+          created_at: demoUser.created_at ?? new Date().toISOString(),
         },
         loading: false,
       })
