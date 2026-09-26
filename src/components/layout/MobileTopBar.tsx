@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Bell, ChevronRight, LogOut, Settings, UserCircle, X } from 'lucide-react'
+import { Bell, LogOut, Settings, UserCircle, X } from 'lucide-react'
 import { BrandMark } from '../ui/BrandMark'
 import type { Profile } from '../../types/inventory'
 import { signOut } from '../../services/authService'

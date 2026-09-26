@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff, LogIn, AlertCircle, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react'
 import { BrandMark } from '../components/ui/BrandMark'
-import { signIn, signUp, setDemoSession } from '../services/authService'
+import { signIn, setDemoSession } from '../services/authService'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 
 export default function LoginPage() {
